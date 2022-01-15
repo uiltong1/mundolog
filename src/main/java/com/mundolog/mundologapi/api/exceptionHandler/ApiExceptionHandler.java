@@ -18,6 +18,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.mundolog.mundologapi.domain.exception.GenericException;
+import com.mundolog.mundologapi.domain.exception.NotFoundException;
 
 import lombok.AllArgsConstructor;
 
@@ -53,4 +54,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		Erro erro = new Erro(status.value(), ex.getMessage(), new Date());
 		return handleExceptionInternal(ex, erro, new HttpHeaders(), status, request);
 	}
+
+	@ExceptionHandler(NotFoundException.class)
+	public ResponseEntity<Object> handleNotFoundException(NotFoundException ex, WebRequest request) {
+		HttpStatus status = HttpStatus.NOT_FOUND;
+
+		Erro erro = new Erro(status.value(), ex.getMessage(), new Date());
+		return handleExceptionInternal(ex, erro, new HttpHeaders(), status, request);
+	}
+
 }

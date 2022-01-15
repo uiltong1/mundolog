@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mundolog.mundologapi.api.mapper.ClienteModelMapper;
+import com.mundolog.mundologapi.api.model.request.Cliente.ClienteRequestModel;
+import com.mundolog.mundologapi.api.model.response.Cliente.ClienteResponseModel;
 import com.mundolog.mundologapi.domain.model.Cliente;
-import com.mundolog.mundologapi.domain.repository.ClienteRepository;
 import com.mundolog.mundologapi.domain.services.ClienteService;
 
 import lombok.AllArgsConstructor;
@@ -27,43 +29,37 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/clientes")
 public class ClienteController {
 
-	private ClienteRepository clienteRepository;
-
 	private ClienteService clienteService;
+	private ClienteModelMapper clienteModelMapper;
 
 	@GetMapping
-	public List<Cliente> index() {
-		return clienteRepository.findAll();
+	public List<ClienteResponseModel> index() {
+		return clienteModelMapper.toCollection(clienteService.index());
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Cliente> get(@PathVariable("id") Long id) {
-		return clienteRepository.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+	public ResponseEntity<ClienteResponseModel> get(@PathVariable("id") Long id) {
+		Cliente cliente = clienteService.buscar(id);
+		return ResponseEntity.ok(clienteModelMapper.toModel(cliente));
 	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Cliente store(@Valid @RequestBody Cliente cliente) {
-		return clienteService.salvar(cliente);
+	public ClienteResponseModel store(@Valid @RequestBody ClienteRequestModel clienteRequestModel) {
+		Cliente cliente = clienteModelMapper.toEntity(clienteRequestModel);
+		return clienteModelMapper.toModel(clienteService.salvar(cliente));
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Cliente> update(@PathVariable("id") Long id, @Valid @RequestBody Cliente cliente) {
-		if (!clienteRepository.existsById(id)) {
-			return ResponseEntity.notFound().build();
-		}
-
-		cliente.setId(id);
-		return ResponseEntity.ok(clienteService.salvar(cliente));
+	public ResponseEntity<ClienteResponseModel> update(@PathVariable("id") Long id,
+			@Valid @RequestBody ClienteRequestModel clienteRequestModel) {
+		Cliente cliente = clienteModelMapper.toEntity(clienteRequestModel);
+		return ResponseEntity.ok(clienteModelMapper.toModel(clienteService.atualizar(id, cliente)));
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		if (!clienteRepository.existsById(id)) {
-			return ResponseEntity.notFound().build();
-		}
-
-		clienteRepository.deleteById(id);
+		clienteService.deletar(id);
 		return ResponseEntity.noContent().build();
 	}
 }
