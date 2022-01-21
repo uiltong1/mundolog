@@ -22,27 +22,34 @@ import com.mundolog.mundologapi.api.model.response.Cliente.ClienteResponseModel;
 import com.mundolog.mundologapi.domain.model.Cliente;
 import com.mundolog.mundologapi.domain.services.ClienteService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
+@Api(tags = "Cliente")
 @RequestMapping("/api/v1/clientes")
 public class ClienteController {
 
 	private ClienteService clienteService;
 	private ClienteModelMapper clienteModelMapper;
 
+	@ApiOperation(value = "Listar")
 	@GetMapping
 	public List<ClienteResponseModel> index() {
+		System.out.println("testando");
 		return clienteModelMapper.toCollection(clienteService.index());
 	}
-
+	
+	@ApiOperation(value = "Consultar")
 	@GetMapping("/{id}")
 	public ResponseEntity<ClienteResponseModel> get(@PathVariable("id") Long id) {
 		Cliente cliente = clienteService.buscar(id);
 		return ResponseEntity.ok(clienteModelMapper.toModel(cliente));
 	}
 
+	@ApiOperation(value = "Registrar")
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ClienteResponseModel store(@Valid @RequestBody ClienteRequestModel clienteRequestModel) {
@@ -50,6 +57,7 @@ public class ClienteController {
 		return clienteModelMapper.toModel(clienteService.salvar(cliente));
 	}
 
+	@ApiOperation(value = "Atualizar")
 	@PutMapping("/{id}")
 	public ResponseEntity<ClienteResponseModel> update(@PathVariable("id") Long id,
 			@Valid @RequestBody ClienteRequestModel clienteRequestModel) {
@@ -57,6 +65,7 @@ public class ClienteController {
 		return ResponseEntity.ok(clienteModelMapper.toModel(clienteService.atualizar(id, cliente)));
 	}
 
+	@ApiOperation(value = "Excluir")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		clienteService.deletar(id);

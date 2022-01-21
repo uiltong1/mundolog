@@ -21,10 +21,13 @@ import com.mundolog.mundologapi.domain.model.Ocorrencia;
 import com.mundolog.mundologapi.domain.services.EntregaService;
 import com.mundolog.mundologapi.domain.services.OcorrenciaService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
+@Api(tags = "Ocorrências")
 @RequestMapping("/api/v1/entregas/{entregaId}/ocorrencias")
 public class OcorrenciaController {
 
@@ -32,12 +35,14 @@ public class OcorrenciaController {
 	private OcorrenciaService ocorrenciaService;
 	private OcorrenciaMapper ocorrenciaMapper;
 
+	@ApiOperation(value = "Listar")
 	@GetMapping
 	public List<OcorrenciaResponseModel> index(@PathVariable Long entregaId) {
 		Entrega entrega = entregaService.get(entregaId);
 		return ocorrenciaMapper.toCollection(entrega.getOcorrencias());
 	}
 
+	@ApiOperation(value = "Registrar")
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public OcorrenciaResponseModel salvar(@PathVariable Long entregaId,

@@ -21,26 +21,32 @@ import com.mundolog.mundologapi.api.model.response.Entrega.EntregaResponseModel;
 import com.mundolog.mundologapi.domain.model.Entrega;
 import com.mundolog.mundologapi.domain.services.EntregaService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
+@Api(tags = "Entrega")
 @RequestMapping("/api/v1/entregas")
 public class EntregaController {
 
 	private EntregaService entregaService;
 	private EntregaMapper entregaMapper;
 
+	@ApiOperation(value = "Listar")
 	@GetMapping
 	public List<EntregaResponseModel> index() {
 		return entregaMapper.toCollection(entregaService.index());
 	}
 
+	@ApiOperation(value = "Consultar")
 	@GetMapping("/{id}")
 	public ResponseEntity<EntregaResponseModel> get(@PathVariable Long id) {
 		return ResponseEntity.ok(entregaMapper.toModel(entregaService.get(id)));
 	}
 
+	@ApiOperation(value = "Registrar")
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public EntregaResponseModel solicitar(@Valid @RequestBody EntregaRequestModel entregaRequestModel) {
@@ -48,12 +54,14 @@ public class EntregaController {
 		return entregaMapper.toModel(entregaService.solicitarEntrega(entrega));
 	}
 	
+	@ApiOperation(value = "Finalizar")
 	@PutMapping("/{entregaId}/finalizar")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void finalizar(@PathVariable Long entregaId) {
 		entregaService.finalizar(entregaId);
 	}
 	
+	@ApiOperation(value = "Cancelar")
 	@PutMapping("/{entregaId}/cancelar")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void cancelar(@PathVariable Long entregaId) {
